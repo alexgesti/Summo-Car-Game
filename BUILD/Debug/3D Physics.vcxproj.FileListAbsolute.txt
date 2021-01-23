@@ -1,2 +1,4 @@
 C:\Users\raulc\Documents\GitHub\Racing-Car-Game\BUILD\Debug\PepeKart.exe
 C:\Users\raulc\Documents\GitHub\Racing-Car-Game\BUILD\Debug\PepeKart.pdb
+D:\cosas de clase\FisicaII\Racing-Car-Game\BUILD\Debug\PepeKart.exe
+D:\cosas de clase\FisicaII\Racing-Car-Game\BUILD\Debug\PepeKart.pdb

@@ -8,6 +8,7 @@
 
 struct PhysBody3D;
 struct PhysMotor3D;
+struct PhysVehicle3D;
 
 class ModuleSceneIntro : public Module
 {
@@ -23,10 +24,14 @@ public:
 
 	void OnCollision(PhysBody3D* body1, PhysBody3D* body2);
 
+private:
+
+	void DummyValues();
+
 public:
 
     // Array of primitives
-    p2DynArray<Primitive*> primitives;
+	PhysVehicle3D* dummy;
 
 	PhysBody3D* pb_chassis;
 	Cube p_chassis;
@@ -39,4 +44,8 @@ public:
 
 	PhysMotor3D* left_wheel;
 	PhysMotor3D* right_wheel;
+
+	Sphere live1;
+	Sphere live2;
+	Sphere live3;
 };

@@ -22,8 +22,8 @@ bool ModulePlayer::Start()
 	VehicleInfo car;
 
 	// Car properties ----------------------------------------
-	car.chassis_size.Set(2, 2, 4);
-	car.chassis_offset.Set(0, 1.5, 0);
+	car.chassis_size.Set(2, 1.5, 4);
+	car.chassis_offset.Set(0, 1, 0);
 	car.mass = 500.0f;
 	car.suspensionStiffness = 15.88f;
 	car.suspensionCompression = 0.83f;
@@ -98,8 +98,10 @@ bool ModulePlayer::Start()
 	car.wheels[3].steering = false;
 
 	vehicle = App->physics->AddVehicle(car);
-	vehicle->SetPos(0, 12, 10);
-	
+	vehicle->SetPos(0, 1, 0);
+
+	live = 3;
+
 	return true;
 }
 
@@ -116,10 +118,16 @@ update_status ModulePlayer::Update(float dt)
 {
 	turn = acceleration = brake = 0.0f;
 
-	if(App->input->GetKey(SDL_SCANCODE_UP) == KEY_REPEAT)
+	if (App->input->GetKey(SDL_SCANCODE_UP) == KEY_REPEAT && vehicle->GetKmh() < 75)
 	{
 		acceleration = MAX_ACCELERATION;
 	}
+	else if (vehicle->GetKmh() >= 0)
+	{
+		acceleration = -MAX_ACCELERATION;
+	}
+
+	if (App->input->GetKey(SDL_SCANCODE_Q) == KEY_DOWN) live--;
 
 	if(App->input->GetKey(SDL_SCANCODE_LEFT) == KEY_REPEAT)
 	{
@@ -145,14 +153,6 @@ update_status ModulePlayer::Update(float dt)
 
     // Render vehicle
 	vehicle->Render();
-
-    // Move camera (overrides camera controls in ModuleCamera3D)
-    App->camera->Reference = vehicle->GetPos(); // Set camera reference to car's CM
-    App->camera->Position = vehicle->GetPos(); // Set camera to car's CM
-    App->camera->Position -= vehicle->GetFwdAxis() * 10.0; // Move camera away on car's fwd axis
-    App->camera->Position += vec3{ 0.0, 1.0, 0.0 } * 5.0; // Move camera up a little
-    App->camera->LookAt(vehicle->GetPos() + vec3{ 0.0, 1.0, 0.0 } * 2.0); // Look at car's CM (a bit up)
-    App->camera->GetViewMatrix(); // Refresh camera viewpoint
 
     // Info
 	char title[80];
