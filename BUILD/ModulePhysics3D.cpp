@@ -5,6 +5,8 @@
 #include "PhysVehicle3D.h"
 #include "Primitive.h"
 
+#include "glut/glut.h"
+
 #ifdef _DEBUG
 	#pragma comment (lib, "Bullet/libx86/BulletDynamics_debug.lib")
 	#pragma comment (lib, "Bullet/libx86/BulletCollision_debug.lib")
@@ -15,7 +17,8 @@
 	#pragma comment (lib, "Bullet/libx86/LinearMath.lib")
 #endif
 
-ModulePhysics3D::ModulePhysics3D(Application* app, bool start_enabled) : Module(app, start_enabled)
+//ModulePhysics3D::ModulePhysics3D(Application* app, bool start_enabled) : Module(app, start_enabled)
+ModulePhysics3D::ModulePhysics3D(bool start_enabled) : Module(start_enabled), world(nullptr)
 {
 	debug = true;
 
@@ -189,6 +192,16 @@ bool ModulePhysics3D::CleanUp()
 	delete world;
 
 	return true;
+}
+
+void ModulePhysics3D::AddBodyToWorld(btRigidBody* body)
+{
+    world->addRigidBody(body);
+}
+
+void ModulePhysics3D::RemoveBodyFromWorld(btRigidBody* body)
+{
+    world->removeRigidBody(body);
 }
 
 // ---------------------------------------------------------

@@ -5,7 +5,8 @@
 #include "PhysVehicle3D.h"
 #include "PhysBody3D.h"
 
-ModulePlayer::ModulePlayer(Application* app, bool start_enabled) : Module(app, start_enabled), vehicle(NULL)
+//ModulePlayer::ModulePlayer(Application* app, bool start_enabled) : Module(app, start_enabled), vehicle(NULL)
+ModulePlayer::ModulePlayer(bool start_enabled) : Module(start_enabled), vehicle(NULL)
 {
 	turn = acceleration = brake = 0.0f;
 }
@@ -115,7 +116,10 @@ update_status ModulePlayer::Update(float dt)
 {
 	turn = acceleration = brake = 0.0f;
 
-	if(App->input->GetKey(SDL_SCANCODE_UP) == KEY_REPEAT) acceleration = MAX_ACCELERATION;
+	if(App->input->GetKey(SDL_SCANCODE_UP) == KEY_REPEAT)
+	{
+		acceleration = MAX_ACCELERATION;
+	}
 
 	if(App->input->GetKey(SDL_SCANCODE_LEFT) == KEY_REPEAT)
 	{
@@ -129,24 +133,34 @@ update_status ModulePlayer::Update(float dt)
 			turn -= TURN_DEGREES;
 	}
 
-	if(App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_REPEAT) acceleration = - MAX_ACCELERATION / 2;
+	if(App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_REPEAT)
+	{
+		brake = BRAKE_POWER;
+	}
 
-
+    // Apply controls to vehicle
 	vehicle->ApplyEngineForce(acceleration);
 	vehicle->Turn(turn);
 	vehicle->Brake(brake);
 
+    // Render vehicle
 	vehicle->Render();
 
+    // Move camera (overrides camera controls in ModuleCamera3D)
+    App->camera->Reference = vehicle->GetPos(); // Set camera reference to car's CM
+    App->camera->Position = vehicle->GetPos(); // Set camera to car's CM
+    App->camera->Position -= vehicle->GetFwdAxis() * 10.0; // Move camera away on car's fwd axis
+    App->camera->Position += vec3{ 0.0, 1.0, 0.0 } * 5.0; // Move camera up a little
+    App->camera->LookAt(vehicle->GetPos() + vec3{ 0.0, 1.0, 0.0 } * 2.0); // Look at car's CM (a bit up)
+    App->camera->GetViewMatrix(); // Refresh camera viewpoint
+
+    // Info
 	char title[80];
-	sprintf_s(title, "%.1f Km/h", vehicle->GetKmh());
+	sprintf_s(title, "Rocket League | Car speed: %.1f km/h", vehicle->GetKmh());
 	App->window->SetTitle(title);
 
 	return UPDATE_CONTINUE;
 }
 
-btVector3 ModulePlayer::GetPosition()
-{
-	return vehicle->vehicle->getRigidBody()->getCenterOfMassPosition();
-}
+
 

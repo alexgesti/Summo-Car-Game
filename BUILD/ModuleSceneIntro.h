@@ -12,16 +12,21 @@ struct PhysMotor3D;
 class ModuleSceneIntro : public Module
 {
 public:
-	ModuleSceneIntro(Application* app, bool start_enabled = true);
+	//ModuleSceneIntro(Application* app, bool start_enabled = true);
+    ModuleSceneIntro(bool start_enabled = true);
 	~ModuleSceneIntro();
 
 	bool Start();
 	update_status Update(float dt);
+    update_status PostUpdate(float dt);
 	bool CleanUp();
 
 	void OnCollision(PhysBody3D* body1, PhysBody3D* body2);
 
 public:
+
+    // Array of primitives
+    p2DynArray<Primitive*> primitives;
 
 	PhysBody3D* pb_chassis;
 	Cube p_chassis;

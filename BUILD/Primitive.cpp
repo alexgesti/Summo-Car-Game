@@ -4,6 +4,8 @@
 #include <gl/GLU.h>
 #include "Primitive.h"
 #include "glut/glut.h"
+#include "Globals.h"
+#include "Application.h"
 
 #pragma comment (lib, "glut/glut32.lib")
 
@@ -15,6 +17,11 @@ Primitive::Primitive() : transform(IdentityMatrix), color(White), wire(false), a
 PrimitiveTypes Primitive::GetType() const
 {
 	return type;
+}
+
+void Primitive::Update()
+{
+    body.GetTransform(&transform);
 }
 
 // ------------------------------------------------------------
@@ -166,6 +173,17 @@ Sphere::Sphere() : Primitive(), radius(1.0f)
 Sphere::Sphere(float radius) : Primitive(), radius(radius)
 {
 	type = PrimitiveTypes::Primitive_Sphere;
+}
+
+Sphere::Sphere(float _radius, float mass) : Primitive(), radius(_radius)
+{
+    type = PrimitiveTypes::Primitive_Sphere;
+    body.SetBody(this, mass);
+}
+
+float Sphere::GetRadius() const
+{
+    return radius;
 }
 
 void Sphere::InnerRender() const

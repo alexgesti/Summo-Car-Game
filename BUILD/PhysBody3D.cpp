@@ -1,15 +1,45 @@
 #include "PhysBody3D.h"
+#include "Globals.h"
+#include "Application.h"
+#include "Primitive.h"
 #include "glmath.h"
 #include "Bullet/include/btBulletDynamicsCommon.h"
 
 // =================================================
-PhysBody3D::PhysBody3D(btRigidBody* body) : body(body)
+PhysBody3D::PhysBody3D()
+    : body(nullptr)
+    , colShape(nullptr)
+    , motionState(nullptr)
+    , parentPrimitive(nullptr)
+    , collision_listeners()
 {}
+
+PhysBody3D::PhysBody3D(btRigidBody* body)
+    : body(nullptr)
+    , colShape(nullptr)
+    , motionState(nullptr)
+    , parentPrimitive(nullptr)
+    , collision_listeners()
+{
+    this->body = body;
+}
 
 // ---------------------------------------------------------
 PhysBody3D::~PhysBody3D()
 {
-	delete body;
+    if (body != nullptr)
+    {
+        App->physics->RemoveBodyFromWorld(body);
+        delete body;
+        delete colShape;
+        delete motionState;
+    }
+}
+
+void PhysBody3D::SetBody(Sphere* primitive, float mass)
+{
+    SetBody(new btSphereShape(primitive->GetRadius()),
+        primitive, mass);
 }
 
 // ---------------------------------------------------------
@@ -44,4 +74,27 @@ void PhysBody3D::SetPos(float x, float y, float z)
 	btTransform t = body->getWorldTransform();
 	t.setOrigin(btVector3(x, y, z));
 	body->setWorldTransform(t);
+}
+
+void PhysBody3D::SetBody(btCollisionShape* shape, Primitive* parent, float mass)
+{
+    parentPrimitive = parent;
+
+    colShape = shape;
+
+    btTransform startTransform;
+    startTransform.setFromOpenGLMatrix(&parent->transform);
+
+    btVector3 localInertia(0, 0, 0);
+    if (mass != 0.f)
+        colShape->calculateLocalInertia(mass, localInertia);
+
+    motionState = new btDefaultMotionState(startTransform);
+    btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, motionState, colShape, localInertia);
+
+    body = new btRigidBody(rbInfo);
+
+    body->setUserPointer(this);
+
+    App->physics->AddBodyToWorld(body);
 }

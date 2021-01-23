@@ -4,7 +4,8 @@
 #include "Primitive.h"
 #include "PhysBody3D.h"
 
-ModuleSceneIntro::ModuleSceneIntro(Application* app, bool start_enabled) : Module(app, start_enabled)
+//ModuleSceneIntro::ModuleSceneIntro(Application* app, bool start_enabled) : Module(app, start_enabled)
+ModuleSceneIntro::ModuleSceneIntro(bool start_enabled) : Module(start_enabled)
 {
 }
 
@@ -17,8 +18,10 @@ bool ModuleSceneIntro::Start()
 	LOG("Loading Intro assets");
 	bool ret = true;
 
-	App->camera->Move(vec3(1.0f, 1.0f, 0.0f));
-	App->camera->LookAt(vec3(0, 0, 0));
+    // Add a ball
+    Primitive* p = new Sphere(5, 2);
+    p->body.SetPos(0, 10, 15);
+    primitives.PushBack(p);
 
 	return ret;
 }
@@ -34,13 +37,24 @@ bool ModuleSceneIntro::CleanUp()
 // Update
 update_status ModuleSceneIntro::Update(float dt)
 {
-	//App->camera->Look(App->camera->Position, App->player->GetPosition(), true); NEED TO PASS THE VECTOR3 FROM TE BODY
-
-	Plane p(0, 1, 0, 0);
+    Plane p(0, 1, 0, 0);
 	p.axis = true;
 	p.Render();
 
+    for (uint n = 0; n < primitives.Count(); n++)
+        primitives[n]->Update();
+
 	return UPDATE_CONTINUE;
+}
+
+update_status ModuleSceneIntro::PostUpdate(float dt)
+{
+    for (uint n = 0; n < primitives.Count(); n++)
+    {
+        primitives[n]->Render();
+    }
+
+    return UPDATE_CONTINUE;
 }
 
 void ModuleSceneIntro::OnCollision(PhysBody3D* body1, PhysBody3D* body2)

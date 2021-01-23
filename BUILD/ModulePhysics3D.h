@@ -17,7 +17,8 @@ struct VehicleInfo;
 class ModulePhysics3D : public Module
 {
 public:
-	ModulePhysics3D(Application* app, bool start_enabled = true);
+	//ModulePhysics3D(Application* app, bool start_enabled = true);
+    ModulePhysics3D(bool start_enabled = true);
 	~ModulePhysics3D();
 
 	bool Init();
@@ -26,6 +27,10 @@ public:
 	update_status Update(float dt);
 	update_status PostUpdate(float dt);
 	bool CleanUp();
+
+    void AddBodyToWorld(btRigidBody* body);
+
+    void RemoveBodyFromWorld(btRigidBody* body);
 
 	PhysBody3D* AddBody(const Sphere& sphere, float mass = 1.0f);
 	PhysBody3D* AddBody(const Cube& cube, float mass = 1.0f);
