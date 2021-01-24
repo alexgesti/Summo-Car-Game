@@ -2,6 +2,8 @@
 #include "Module.h"
 #include "Globals.h"
 #include "p2Point.h"
+#include "PhysVehicle3D.h"
+#include "PhysBody3D.h"
 
 struct PhysVehicle3D;
 
@@ -27,5 +29,11 @@ public:
 	float acceleration;
 	float brake;
 
+	bool counterstart;
+	bool countercantspeed;
+	float counter_speed_go_go;
+	float counter_cant_go_speed;
+
 	float live;
+
 };

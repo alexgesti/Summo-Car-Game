@@ -34,6 +34,7 @@ struct VehicleInfo
 	float maxSuspensionTravelCm; // default to 500 cm suspension can be compressed
 	float frictionSlip; // defaults to 10.5 / friction with the ground. 0.8 should be good but high values feels better (kart 1000.0)
 	float maxSuspensionForce; // defaults to 6000 / max force to the chassis
+	Color color;
 
 	Wheel* wheels;
 	int num_wheels;

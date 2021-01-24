@@ -10,6 +10,7 @@ Application::Application() : debug(false), renderPrimitives(true), dt(0.16f)
 	camera = new ModuleCamera3D();
 	physics = new ModulePhysics3D();
 	player = new ModulePlayer();
+	player2 = new ModulePlayer2();
 
 	// The order of calls is very important!
 	// Modules will Init() Start() and Update in this order
@@ -25,6 +26,7 @@ Application::Application() : debug(false), renderPrimitives(true), dt(0.16f)
 	// Scenes
 	AddModule(scene_intro);
 	AddModule(player);
+	AddModule(player2);
 
 	// Renderer last!
 	AddModule(renderer3D);

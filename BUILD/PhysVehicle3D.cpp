@@ -39,12 +39,11 @@ void PhysVehicle3D::Render()
 	}
 
 	chassis = Cube(info.chassis_size.x, info.chassis_size.y, info.chassis_size.z);
-	if (App->player->live != 0) chassis.color = Red;
-	else if (App->player->live == 0) chassis.color = Green;
 	vehicle->getChassisWorldTransform().getOpenGLMatrix(&chassis.transform);
 	btQuaternion q = vehicle->getChassisWorldTransform().getRotation();
 	btVector3 offset(info.chassis_offset.x, info.chassis_offset.y, info.chassis_offset.z);
 	offset = offset.rotate(q.getAxis(), q.getAngle());
+	chassis.color = info.color;
 
 	chassis.transform.M[12] += offset.getX();
 	chassis.transform.M[13] += offset.getY();

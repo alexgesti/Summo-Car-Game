@@ -22,7 +22,7 @@ public:
     update_status PostUpdate(float dt);
 	bool CleanUp();
 
-	void OnCollision(PhysBody3D* body1, PhysBody3D* body2);
+	void OnCollision(PhysVehicle3D* body1, PhysVehicle3D* body2);
 
 private:
 
@@ -30,7 +30,6 @@ private:
 
 public:
 
-    // Array of primitives
 	PhysVehicle3D* dummy;
 
 	PhysBody3D* pb_chassis;
@@ -48,4 +47,19 @@ public:
 	Sphere live1;
 	Sphere live2;
 	Sphere live3;
+	Sphere GoFuckingNuts;
+
+	Sphere live4;
+	Sphere live5;
+	Sphere live6;
+	Sphere GoFuckingNuts2;
+
+	Cube greed;
+	Cube wall1;
+	Cube wall2;
+	Cube wall3;
+	Cube wall4;
+	Cube aux1;
+	Cube aux2;
+	Cube aux3;
 };

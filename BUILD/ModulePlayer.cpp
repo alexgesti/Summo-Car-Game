@@ -24,13 +24,14 @@ bool ModulePlayer::Start()
 	// Car properties ----------------------------------------
 	car.chassis_size.Set(2, 1.5, 4);
 	car.chassis_offset.Set(0, 1, 0);
-	car.mass = 500.0f;
+	car.mass = 1000.0f;
 	car.suspensionStiffness = 15.88f;
 	car.suspensionCompression = 0.83f;
 	car.suspensionDamping = 0.88f;
 	car.maxSuspensionTravelCm = 1000.0f;
 	car.frictionSlip = 50.5;
 	car.maxSuspensionForce = 6000.0f;
+	car.color = Red;
 
 	// Wheel properties ---------------------------------------
 	float connection_height = 1.2f;
@@ -98,7 +99,10 @@ bool ModulePlayer::Start()
 	car.wheels[3].steering = false;
 
 	vehicle = App->physics->AddVehicle(car);
-	vehicle->SetPos(0, 1, 0);
+	vehicle->SetPos(5, 1, 0);
+
+	counterstart = false;
+	counter_cant_go_speed = 0;
 
 	live = 3;
 
@@ -118,33 +122,116 @@ update_status ModulePlayer::Update(float dt)
 {
 	turn = acceleration = brake = 0.0f;
 
-	if (App->input->GetKey(SDL_SCANCODE_UP) == KEY_REPEAT && vehicle->GetKmh() < 75)
+	if (live > 0)
 	{
-		acceleration = MAX_ACCELERATION;
+		if (App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT)
+		{
+			if (counterstart == false && vehicle->GetKmh() < 75) acceleration = MAX_ACCELERATION;
+
+			if (vehicle->GetKmh() <= -1)
+			{
+				brake = BRAKE_POWER / 2;
+			}
+		}
+		else if (vehicle->GetKmh() >= 0)
+		{
+			acceleration = -MAX_ACCELERATION;
+		}
+
+		if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT)
+		{
+			if (turn < TURN_DEGREES)
+				turn += TURN_DEGREES;
+		}
+
+		if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT)
+		{
+			if (turn > -TURN_DEGREES)
+				turn -= TURN_DEGREES;
+		}
+
+		if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT)
+		{
+			if (vehicle->GetKmh() >= 0)
+			{
+				brake = BRAKE_POWER;
+			}
+			else if (vehicle->GetKmh() > -75)
+			{
+				acceleration = -MAX_ACCELERATION;
+			}
+		}
+		else if (vehicle->GetKmh() <= 0)
+		{
+			acceleration = MAX_ACCELERATION;
+		}
+
+		if (App->input->GetKey(SDL_SCANCODE_Q) == KEY_REPEAT)
+		{
+			if (countercantspeed == false)
+			{
+				counterstart = true;
+			}
+		}
+
+		if (counterstart && countercantspeed == false)
+		{
+			counter_speed_go_go += 1 * dt;
+		}
+		if (counter_speed_go_go >= 2.5f && counterstart)
+		{
+			counterstart = false;
+			countercantspeed = true;
+			App->scene_intro->GoFuckingNuts.color = Red;
+		}
+
+		if (countercantspeed && counterstart == false)
+		{
+			counter_cant_go_speed += 1 * dt;
+		}
+		if (counter_cant_go_speed >= 10 && countercantspeed)
+		{
+			counterstart = false;
+			countercantspeed = false;
+			counter_speed_go_go = 0;
+			counter_cant_go_speed = 0;
+			App->scene_intro->GoFuckingNuts.color = Green;
+		}
+
+		//Limits/Collisions
+		//EJE X
+		if (vehicle->GetPos().x >= 50) // WALL 1
+		{
+			vec3 aux = vehicle->GetPos();
+			LOG("%f %f %f", aux.x, aux.y, aux.z);
+			vehicle->SetPos(50, aux.y, aux.z);
+		}
+		if (vehicle->GetPos().x <= -50) // WALL 2
+		{
+			vec3 aux = vehicle->GetPos();
+			//LOG("%f %f %f", aux.x, aux.y, aux.z);
+			vehicle->SetPos(-50, aux.y, aux.z);
+		}
+		//EJE Y
+		if (vehicle->GetPos().z >= 35) // WALL 3
+		{
+			vec3 aux = vehicle->GetPos();
+			//LOG("%f %f %f", aux.x, aux.y, aux.z);
+			vehicle->SetPos(aux.x, aux.y, 35);
+		}
+		if (vehicle->GetPos().z <= -45) // WALL 4
+		{
+			vec3 aux = vehicle->GetPos();
+			//LOG("%f %f %f", aux.x, aux.y, aux.z);
+			vehicle->SetPos(aux.x, aux.y, -45);
+		}
 	}
-	else if (vehicle->GetKmh() >= 0)
+	else 
 	{
-		acceleration = -MAX_ACCELERATION;
+		vehicle->SetPos(0, 0, -200);
 	}
 
-	if (App->input->GetKey(SDL_SCANCODE_Q) == KEY_DOWN) live--;
-
-	if(App->input->GetKey(SDL_SCANCODE_LEFT) == KEY_REPEAT)
-	{
-		if(turn < TURN_DEGREES)
-			turn +=  TURN_DEGREES;
-	}
-
-	if(App->input->GetKey(SDL_SCANCODE_RIGHT) == KEY_REPEAT)
-	{
-		if(turn > -TURN_DEGREES)
-			turn -= TURN_DEGREES;
-	}
-
-	if(App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_REPEAT)
-	{
-		brake = BRAKE_POWER;
-	}
+	if (App->input->GetKey(SDL_SCANCODE_F5) == KEY_DOWN) live--;
 
     // Apply controls to vehicle
 	vehicle->ApplyEngineForce(acceleration);
