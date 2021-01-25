@@ -1,4 +1,4 @@
-# Racing Car Game
+# Summo Car Game
 
 ## Goal
 
